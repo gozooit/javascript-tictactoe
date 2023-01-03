@@ -7,6 +7,12 @@ const gameBoard = (() => {
     position = convertPosition(positionNumber);
     row = convertRow(rowNumber);
     !row[position] ? row[position] = symbol : console.log('error');
+    displayController.update();
+  };
+  const reset = () => {
+    firstRow = ["","",""];
+    secondRow = ["","",""];
+    thirdRow = ["","",""];
   };
   const convertRow = (rowNumber) => {
     switch (rowNumber) {
@@ -25,6 +31,7 @@ const gameBoard = (() => {
     thirdRow,
     board,
     addSymbol,
+    reset,
   };
 })();
 
@@ -64,15 +71,47 @@ const displayController = (() => {
   return {
     create,
     update,
-  }
+  };
 })();
 
 const Player = (name, symbol) => {
   return { name, symbol };
 };
 
-const theGame = (() => {
+const game = (() => {
+  const start = () => {
 
+  }
+  const checkWin = (symbol) => {
+    if (rowWin(symbol) || columnWin(symbol) || diagonalWin(symbol)) {
+      return true;
+    } else {
+      return false;
+    };
+  };
+  const rowWin = (symbol) => {
+    return gameBoard.board.some(row => (row.every(cell => cell === symbol)));
+  };
+  const columnWin = (symbol) => {
+    for (let i = 0; i < 3; i++) {
+      if ([gameBoard.firstRow[i], gameBoard.secondRow[i], gameBoard.thirdRow[i]].every(cell => cell === symbol)) {
+        return true;
+      };      
+    };
+  };
+  const diagonalWin = (symbol) => {
+    if ([gameBoard.firstRow[0], gameBoard.secondRow[1], gameBoard.thirdRow[2]].every(cell => cell === symbol)) {
+      return true;
+    } else if ([gameBoard.firstRow[2], gameBoard.secondRow[1], gameBoard.thirdRow[0]].every(cell => cell === symbol)) {
+      return true;
+    } else {
+      return false;
+    };
+  };
+  return {
+    start,
+    checkWin,
+  };
 })();
 
 displayController.create();
@@ -80,15 +119,15 @@ displayController.create();
 const p1 = Player('gozoo', 'X');
 const p2 = Player('gwen', 'O');
 
-console.log(gameBoard.board);
+
 gameBoard.addSymbol(p1.symbol, 1, 1);
-console.log(gameBoard.board);
-gameBoard.addSymbol(p2.symbol, 2, 2);
-console.log(gameBoard.board);
-gameBoard.addSymbol(p1.symbol, 3, 3);
-console.log(gameBoard.board);
+
+gameBoard.addSymbol(p1.symbol, 2, 1);
+
+gameBoard.addSymbol(p1.symbol, 3, 1);
+
 gameBoard.addSymbol(p2.symbol, 1, 3);
-console.log(gameBoard.board);
-console.log(gameBoard.firstRow);
+
+console.log(game.checkWin(p1.symbol));
 
 displayController.update();
