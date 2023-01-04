@@ -1,3 +1,5 @@
+// TODO Use await async with eventlistener in play loop
+
 const gameBoard = (() => {
   let firstRow = ["","",""];
   let secondRow = ["","",""];
@@ -192,6 +194,20 @@ const Player = (name, symbol) => {
 const Game = (() => {
   const play = () => {
     const players = displayController.setPlayers();
+    let currentPlayer = players[Math.round(Math.random())];
+    while (true) {
+
+      if (checkForTie() || checkForWin()) { break; };
+      // Switch players
+      if (currentPlayer === players[0]) {
+        currentPlayer = players[1];
+      } else {
+        currentPlayer = players[0];
+      }
+    }
+
+  };
+  const switchPlayer = (currentPlayer) => {
 
   };
   const initialize = () => {
@@ -199,7 +215,7 @@ const Game = (() => {
   };
   const checkForTie = () => {
     return gameBoard.board.every(row => row.every(cell => cell !== ''));
-  }
+  };
   const checkForWin = (symbol) => {
     if (rowWin(symbol) || columnWin(symbol) || diagonalWin(symbol)) {
       return true;
