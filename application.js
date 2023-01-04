@@ -166,16 +166,17 @@ const displayController = (() => {
     menu.appendChild(form);
 
     form.addEventListener('submit', () => {
-    // prevent the default behavior which sends to the server
-    event.preventDefault();
+      // prevent the default behavior which sends to the server
+      event.preventDefault();
 
-    const player1Symbol = document.querySelector('input[name="symbol-player-1"]:checked').value;
-    const player1 = Player(form.elements.textPlayer1.value, player1Symbol.value);
-    const player2Symbol = document.querySelector('input[name="symbol-player-2"]:checked').value;
-    const player2 = Player(form.elements.textPlayer2.value, player2Symbol.value);
+      const player1 = Player(form.elements['player-1'].value, form.elements['symbol-player-1'].value);
+      const player2 = Player(form.elements['player-2'].value, form.elements['symbol-player-2'].value);
 
-    return [player1, player2];
-  })
+      form.remove();
+      displayController.createBoard();
+
+      return [player1, player2];
+    })
   }
   return {
     createBoard,
@@ -188,8 +189,9 @@ const Player = (name, symbol) => {
   return { name, symbol };
 };
 
-const game = (() => {
-  const play = (player1, player2) => {
+const Game = (() => {
+  const play = () => {
+    const players = displayController.setPlayers();
 
   };
   const initialize = () => {
@@ -248,4 +250,5 @@ const game = (() => {
 
 // displayController.updateBoard();
 
-displayController.setPlayers();
+const play = document.getElementById('play');
+play.addEventListener('click', Game.play);
