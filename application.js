@@ -51,7 +51,7 @@ const displayController = (() => {
         cellElement.setAttribute('class', 'cell');
         cellElement.setAttribute('data-x', `${rowIndex + 1}`);
         cellElement.setAttribute('data-y', `${cellIndex + 1}`);
-        cellElement.innerText = cell;      
+        cellElement.innerText = cell;
         rowElement.appendChild(cellElement);
       });
       container.appendChild(rowElement);
