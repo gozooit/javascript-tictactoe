@@ -49,13 +49,9 @@ const displayController = (() => {
       row.forEach((cell, cellIndex) => {
         const cellElement = document.createElement('div');
         cellElement.setAttribute('class', 'cell');
-        cellElement.innerText = cell;
-        cellElement.addEventListener('click', () => {
-          // Add the current player's symbol to the cell
-          gameBoard.addSymbol(currentPlayer.symbol, cellIndex + 1, rowIndex + 1);
-          // Update the cell's text to display the symbol
-          cellElement.innerText = currentPlayer.symbol;
-        });
+        cellElement.setAttribute('data-x', `${rowIndex + 1}`);
+        cellElement.setAttribute('data-y', `${cellIndex + 1}`);
+        cellElement.innerText = cell;      
         rowElement.appendChild(cellElement);
       });
       container.appendChild(rowElement);
@@ -194,17 +190,35 @@ const Player = (name, symbol) => {
 const Game = (() => {
   const play = () => {
     const players = displayController.setPlayers();
+    console.log(players)
     let currentPlayer = players[Math.round(Math.random())];
-    while (true) {
+    const board = document.getElementById('board-container');
+    board.addEventListener("click", function(event) {
+      // Get the clicked cell
+      const cell = event.target;
 
-      if (checkForTie() || checkForWin()) { break; };
+      // Do something with the cell and board
+      row = Number((cell.getAttribute('data-x')))
+      column = Number(cell.getAttribute('data-y'))
+      gameBoard.addSymbol(currentPlayer.symbol, row, column);
+      if (checkForTie() || checkForWin()) { console.log('game over') };
       // Switch players
       if (currentPlayer === players[0]) {
         currentPlayer = players[1];
       } else {
         currentPlayer = players[0];
       }
-    }
+    });
+    // while (true) {
+
+      // if (checkForTie() || checkForWin()) { break; };
+      // // Switch players
+      // if (currentPlayer === players[0]) {
+      //   currentPlayer = players[1];
+      // } else {
+      //   currentPlayer = players[0];
+      // }
+    // }
 
   };
   const switchPlayer = (currentPlayer) => {
