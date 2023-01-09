@@ -49,8 +49,8 @@ const displayController = (() => {
       row.forEach((cell, cellIndex) => {
         const cellElement = document.createElement('div');
         cellElement.setAttribute('class', 'cell');
-        cellElement.setAttribute('data-x', `${rowIndex + 1}`);
-        cellElement.setAttribute('data-y', `${cellIndex + 1}`);
+        cellElement.setAttribute('data-y', `${rowIndex + 1}`);
+        cellElement.setAttribute('data-x', `${cellIndex + 1}`);
         cellElement.innerText = cell;
         rowElement.appendChild(cellElement);
       });
@@ -163,17 +163,42 @@ const displayController = (() => {
     form.appendChild(submit);
     menu.appendChild(form);
 
-    form.addEventListener('submit', () => {
-      // prevent the default behavior which sends to the server
-      event.preventDefault();
+    radioSymbolXPlayer1.addEventListener('change', (event) => {
+      if (event.target.checked) {
+        radioSymbolOPlayer2.checked = true;
+      }
+    });
 
-      const player1 = Player(form.elements['player-1'].value, form.elements['symbol-player-1'].value);
-      const player2 = Player(form.elements['player-2'].value, form.elements['symbol-player-2'].value);
+    radioSymbolOPlayer1.addEventListener('change', (event) => {
+      if (event.target.checked) {
+        radioSymbolXPlayer2.checked = true;
+      }
+    });
 
-      form.remove();
-      displayController.createBoard();
+    radioSymbolXPlayer2.addEventListener('change', (event) => {
+      if (event.target.checked) {
+        radioSymbolOPlayer1.checked = true;
+      }
+    });
 
-      return [player1, player2];
+    radioSymbolOPlayer2.addEventListener('change', (event) => {
+      if (event.target.checked) {
+        radioSymbolXPlayer1.checked = true;
+      }
+    });
+
+    return new Promise((resolve) => {
+      form.addEventListener('submit', () => {
+        // prevent the default behavior which sends to the server
+        event.preventDefault();
+  
+        const player1 = Player(form.elements['player-1'].value, form.elements['symbol-player-1'].value);
+        const player2 = Player(form.elements['player-2'].value, form.elements['symbol-player-2'].value);
+  
+        form.remove();
+        displayController.createBoard();
+        resolve([player1, player2])
+      })
     })
   }
   return {
@@ -188,10 +213,11 @@ const Player = (name, symbol) => {
 };
 
 const Game = (() => {
-  const play = () => {
-    const players = displayController.setPlayers();
-    console.log(players)
+  const play = async () => {
+    const players = await displayController.setPlayers();
     let currentPlayer = players[Math.round(Math.random())];
+    const info = document.getElementById('info');
+    info.innerText = `${currentPlayer.name} (${currentPlayer.symbol}), make your move.`
     const board = document.getElementById('board-container');
     board.addEventListener("click", function(event) {
       // Get the clicked cell
@@ -201,31 +227,25 @@ const Game = (() => {
       row = Number((cell.getAttribute('data-x')))
       column = Number(cell.getAttribute('data-y'))
       gameBoard.addSymbol(currentPlayer.symbol, row, column);
-      if (checkForTie() || checkForWin()) { console.log('game over') };
+      if (checkForTie() || checkForWin(currentPlayer.symbol)) { 
+        reset(currentPlayer); 
+      } else {
       // Switch players
       if (currentPlayer === players[0]) {
         currentPlayer = players[1];
       } else {
         currentPlayer = players[0];
       }
+        info.innerText = `${currentPlayer.name} (${currentPlayer.symbol}), make your move.`
+      }
     });
-    // while (true) {
-
-      // if (checkForTie() || checkForWin()) { break; };
-      // // Switch players
-      // if (currentPlayer === players[0]) {
-      //   currentPlayer = players[1];
-      // } else {
-      //   currentPlayer = players[0];
-      // }
-    // }
-
   };
-  const switchPlayer = (currentPlayer) => {
-
-  };
-  const initialize = () => {
-
+  const reset = (winner) => {
+    gameBoard.reset();
+    document.getElementById('board-container').remove();
+    const info = document.getElementById('info');
+    info.setAttribute('id', 'result');
+    info.innerText = `The winner is : ${winner.name}`;
   };
   const checkForTie = () => {
     return gameBoard.board.every(row => row.every(cell => cell !== ''));
@@ -258,7 +278,6 @@ const Game = (() => {
   };
   return {
     play,
-    checkForWin,
   };
 })();
 
